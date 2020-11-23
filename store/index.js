@@ -2,7 +2,8 @@ export const state = () => ({
   user: {},
   messages: [],
   users: []
-})
+});
+
 
 export const mutations = {
   setUser(state, user) {

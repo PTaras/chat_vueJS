@@ -1,274 +1,168 @@
 <template>
-  <div :style="{ width: '300px', height: '600px' }">
-    <svg width="300px" height="600px"></svg>
+  <div>
+    <svg width="290" height="500" class="container-border"></svg>
   </div>
 </template>
-
 <script>
 import * as d3 from "d3";
 export default {
   data() {
-    return {
-      width: 1024,
-      height: 768,
-      selections: {},
-      simulation: null,
-      forceProperties: {
-        center: {
-          x: 0.5,
-          y: 0.5,
-        },
-        charge: {
-          enabled: true,
-          strength: -300,
-          distanceMin: 1,
-          distanceMax: 2000,
-        },
-        collide: {
-          enabled: true,
-          strength: 0.7,
-          iterations: 1,
-          radius: 35,
-        },
-        forceX: {
-          enabled: false,
-          strength: 0.1,
-          x: 0.5,
-        },
-        forceY: {
-          enabled: false,
-          strength: 0.35,
-          y: 0.5,
-        },
-        link: {
-          enabled: true,
-          distance: 100,
-          iterations: 1,
-        },
-      },
-      data: {
-        nodes: [
-          { name: "firmware", group: 1, class: "system" },
-          { name: "loader", group: 1, class: "system" },
-          { name: "kernel", group: 1, class: "system" },
-          { name: "systemd", group: 1, class: "mount" },
-          { name: "-.mount", group: 1, class: "mount" },
-          { name: "init.scope", group: 1, class: "init" },
-          { name: "system.slice", group: 1, class: "init" },
-          { name: "system-getty.slice", group: 1, class: "init" },
-          { name: "systemd-initctl.socker", group: 1, class: "init" },
-          { name: "tmp.mount", group: 1, class: "init" },
-          { name: "sys-devices", group: 2, class: "init" },
-          { name: "boot.mount", group: 2, class: "init" },
-        ],
-        links: [
-          { source: 1, target: 0, value: 1, type: "depends" },
-          { source: 2, target: 1, value: 8, type: "depends" },
-          { source: 3, target: 2, value: 6, type: "depends" },
-          { source: 4, target: 3, value: 1, type: "needs" },
-          { source: 5, target: 3, value: 1, type: "needs" },
-          { source: 6, target: 3, value: 1, type: "needs" },
-          { source: 7, target: 3, value: 1, type: "needs" },
-          { source: 8, target: 3, value: 2, type: "needs" },
-          { source: 9, target: 3, value: 1, type: "needs" },
-          { source: 11, target: 10, value: 1, type: "depends" },
-          { source: 11, target: 3, value: 3, type: "depends" },
-          { source: 11, target: 2, value: 3, type: "depends" },
-          { source: 11, target: 3, value: 5, type: "needs" },
-        ],
-      },
-    };
-  },
-  computed: {
-    nodes() {
-      return this.data.nodes;
-    },
-    links() {
-      return this.data.links;
-    },
+    return {};
   },
   mounted() {
-    let recaptchaScript = document.createElement("script");
-    recaptchaScript.setAttribute("src", "https://cdn.jsdelivr.net/npm/vue");
-    document.head.appendChild(recaptchaScript);
-    let recaptchaScript1 = document.createElement("script");
-    recaptchaScript1.setAttribute("src", "https://d3js.org/d3.v5.min.js");
-    document.head.appendChild(recaptchaScript1);
+    let marge = { top: 5, bottom: 5, left: 5, right: 5 };
+    let svg = d3.select("svg");
+    let width = svg.attr("width");
+    let height = svg.attr("height");
+    let g = svg
+      .append("g")
+      .attr("transform", "translate(" + marge.top + "," + marge.left + ")");
 
-    this.simulation = d3
+    let nodes = [
+      { name: "Taras" },
+      { name: "Anton" },
+      { name: "Mariya" },
+      { name: "Vika" },
+      { name: "Arsen" },
+      { name: "Toha" },
+      { name: "Misha" },
+      { name: "Nika" },
+      { name: "Olya" },
+    ];
+
+    let edges = [
+      { source: 1, target: 4, relation: "1", value: 1.3 },
+      { source: 4, target: 7, relation: "2", value: 1 },
+      { source: 4, target: 6, relation: "3", value: 1 },
+      { source: 4, target: 7, relation: "4", value: 1 },
+      { source: 1, target: 6, relation: "5", value: 2 },
+      { source: 2, target: 5, relation: "6", value: 0.9 },
+      { source: 3, target: 7, relation: "7", value: 1 },
+      { source: 5, target: 6, relation: "8", value: 1.6 },
+      { source: 6, target: 7, relation: "9", value: 0.7 },
+      { source: 6, target: 8, relation: "0", value: 2 },
+    ];
+
+    let colorScale = d3
+      .scaleOrdinal()
+      .domain(d3.range(nodes.length))
+      .range(d3.schemeCategory10);
+
+    let forceSimulation = d3
       .forceSimulation()
       .force("link", d3.forceLink())
       .force("charge", d3.forceManyBody())
-      .force("collide", d3.forceCollide())
-      .force("center", d3.forceCenter())
-      .force("forceX", d3.forceX())
-      .force("forceY", d3.forceY())
-      .on("tick", this.tick);
-    this.updateForces();
+      .force("center", d3.forceCenter());
 
-    this.selections.svg = d3.select(this.$el.querySelector("svg"));
-    this.selections.graph = this.selections.svg.append("g");
-    const graph = this.selections.graph;
+    forceSimulation.nodes(nodes).on("tick", ticked);
 
-    // You can set data in any ways you want
-    // d3.json(data);
-  },
-  methods: {
-    tick() {
-      const transform = (d) => {
+    forceSimulation
+      .force("link")
+      .links(edges)
+      .distance(function (d) {
+        return d.value * 100;
+      });
+
+    forceSimulation
+      .force("center")
+      .x(width / 2)
+      .y(height / 2);
+
+    let links = g
+      .append("g")
+      .selectAll("line")
+      .data(edges)
+      .enter()
+      .append("line")
+      .attr("stroke", function (d, i) {
+        return colorScale(i);
+      })
+      .attr("stroke-width", 1);
+
+    let linksText = g
+      .append("g")
+      .selectAll("text")
+      .data(edges)
+      .enter()
+      .append("text")
+      .text(function (d) {
+        return d.relation;
+      });
+
+    let gs = g
+      .selectAll(".circleText")
+      .data(nodes)
+      .enter()
+      .append("g")
+      .attr("transform", function (d) {
+        let cirX = d.x;
+        let cirY = d.y;
+        return "translate(" + cirX + "," + cirY + ")";
+      })
+      .call(
+        d3.drag().on("start", started).on("drag", dragged).on("end", ended)
+      );
+
+    gs.append("circle")
+      .attr("r", 10)
+      .attr("fill", function (d, i) {
+        return colorScale(i);
+      });
+
+    gs.append("text")
+      .attr("x", -10)
+      .attr("y", -20)
+      .attr("dy", 10)
+      .text(function (d) {
+        return d.name;
+      });
+    // ticked
+    function ticked() {
+      links
+        .attr("x1", function (d) {
+          return d.source.x;
+        })
+        .attr("y1", function (d) {
+          return d.source.y;
+        })
+        .attr("x2", function (d) {
+          return d.target.x;
+        })
+        .attr("y2", function (d) {
+          return d.target.y;
+        });
+      linksText
+        .attr("x", function (d) {
+          return (d.source.x + d.target.x) / 2;
+        })
+        .attr("y", function (d) {
+          return (d.source.y + d.target.y) / 2;
+        });
+      gs.attr("transform", function (d) {
         return "translate(" + d.x + "," + d.y + ")";
-      };
-
-      const link = (d) => {
-        return (
-          "M" +
-          d.source.x +
-          "," +
-          d.source.y +
-          " L" +
-          d.target.x +
-          "," +
-          d.target.y
-        );
-      };
-
-      const graph = this.selections.graph;
-      graph.selectAll("path").attr("d", link);
-      graph.selectAll("circle").attr("transform", transform);
-      graph.selectAll("text").attr("transform", transform);
-    },
-    updateData() {
-      this.simulation.nodes(this.nodes);
-      this.simulation.force("link").links(this.links);
-
-      const simulation = this.simulation;
-      const graph = this.selections.graph;
-
-      graph
-        .selectAll("path")
-        .data(simulation.force("link").links())
-        .enter()
-        .append("path")
-        .attr("class", (d) => "link " + d.type)
-        .exit()
-        .remove();
-
-      graph
-        .selectAll("circle")
-        .data(simulation.nodes())
-        .enter()
-        .append("circle")
-        .attr("r", 30)
-        .attr("class", (d) => d.class)
-        .exit()
-        .remove();
-
-      graph
-        .selectAll("text")
-        .data(simulation.nodes())
-        .enter()
-        .append("text")
-        .attr("x", 0)
-        .attr("y", ".31em")
-        .attr("text-anchor", "middle")
-        .text((d) => d.name);
-
-      simulation.alpha(1).restart();
-    },
-    updateForces() {
-      const { simulation, forceProperties, width, height } = this;
-      simulation
-        .force("center")
-        .x(width * forceProperties.center.x)
-        .y(height * forceProperties.center.y);
-      simulation
-        .force("charge")
-        .strength(
-          forceProperties.charge.strength * forceProperties.charge.enabled
-        )
-        .distanceMin(forceProperties.charge.distanceMin)
-        .distanceMax(forceProperties.charge.distanceMax);
-      simulation
-        .force("collide")
-        .strength(
-          forceProperties.collide.strength * forceProperties.collide.enabled
-        )
-        .radius(forceProperties.collide.radius)
-        .iterations(forceProperties.collide.iterations);
-      simulation
-        .force("forceX")
-        .strength(
-          forceProperties.forceX.strength * forceProperties.forceX.enabled
-        )
-        .x(width * forceProperties.forceX.x);
-      simulation
-        .force("forceY")
-        .strength(
-          forceProperties.forceY.strength * forceProperties.forceY.enabled
-        )
-        .y(height * forceProperties.forceY.y);
-      simulation
-        .force("link")
-        .distance(forceProperties.link.distance)
-        .iterations(forceProperties.link.iterations);
-
-      // updates ignored until this is run
-      // restarts the simulation (important if simulation has already slowed down)
-      simulation.alpha(1).restart();
-    },
-  },
-  watch: {
-    data: {
-      handler(newData) {
-        this.updateData();
-      },
-      deep: true,
-    },
-    forceProperties: {
-      handler(newForce) {
-        this.updateForces();
-      },
-      deep: true,
-    },
+      });
+    }
+    // drag
+    function started(d) {
+      if (!d3.event.active) {
+        forceSimulation.alphaTarget(0.8).restart();
+      }
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+    function dragged(d) {
+      d.fx = d3.event.x;
+      d.fy = d3.event.y;
+    }
+    function ended(d) {
+      if (!d3.event.active) {
+        forceSimulation.alphaTarget(0);
+      }
+      d.fx = null;
+      d.fy = null;
+    }
   },
 };
 </script>
-
-<style>
-path.link {
-  fill: none;
-  stroke: #666;
-  stroke-width: 1.5px;
-}
-path.link.depends {
-  stroke: #005900;
-  stroke-dasharray: 5, 2;
-}
-path.link.needs {
-  stroke: #7f3f00;
-}
-
-circle {
-  fill: #ffff99;
-  stroke: #191900;
-  stroke-width: 1.5px;
-}
-circle.system {
-  fill: #cce5ff;
-  stroke: #003366;
-}
-circle.mount {
-  fill: #ffe5e5;
-  stroke: #660000;
-}
-circle.init {
-  fill: #b2e8b2;
-  stroke: #001900;
-}
-
-text {
-  font: 10px sans-serif;
-  pointer-events: none;
-  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
-}
+<style scoped>
 </style>
