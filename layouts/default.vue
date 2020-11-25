@@ -20,11 +20,6 @@
           </v-list-tile-action>
         </v-list-tile>
       </v-list>
-      <!-- <v-contert>
-        <div id="chart">
-          <svg width="290" height="500" class="container-border"></svg>
-        </div>
-      </v-contert> -->
       <Chart />
     </v-navigation-drawer>
     <v-toolbar app>

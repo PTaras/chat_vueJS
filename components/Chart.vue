@@ -5,10 +5,29 @@
 </template>
 <script>
 import * as d3 from "d3";
+import { mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {};
   },
+  computed: {
+    ...mapState(["user", "users"]),
+  },
+  // methods: {
+  //   getUser(key) {
+  //     let nodes1 = [];
+  //     let edges1 = [];
+  //     let obj = [{ nodes: nodes1 }, { edges: edges1 }];
+  //     const names = Object.values(this.users);
+  //     let i = 0;
+  //     names.forEach((item) => {
+  //       nodes1.push({ name: item.name });
+  //       edges1.push({ source: 1, target: i, relation: i, value: 1.3 });
+  //       i++;
+  //     });
+  //     return obj;
+  //   },
+  // },
   mounted() {
     let marge = { top: 5, bottom: 5, left: 5, right: 5 };
     let svg = d3.select("svg");
@@ -18,30 +37,40 @@ export default {
       .append("g")
       .attr("transform", "translate(" + marge.top + "," + marge.left + ")");
 
-    let nodes = [
-      { name: "Taras" },
-      { name: "Anton" },
-      { name: "Mariya" },
-      { name: "Vika" },
-      { name: "Arsen" },
-      { name: "Toha" },
-      { name: "Misha" },
-      { name: "Nika" },
-      { name: "Olya" },
-    ];
+    let getUser = (key) => {
+      let nodes1 = [];
+      let edges1 = [];
+      let obj = [{ nodes: nodes1 }, { edges: edges1 }];
+      const names = Object.values(this.users);
+      let i = 0;
+      names.forEach((item) => {
+        nodes1.push({ name: item.name });
+        edges1.push({ source: 1, target: i, relation: i, value: 1.3 });
+        i++;
+      });
+      return obj;
+    };
+    let resultGraph = getUser();
+    console.log(resultGraph);
+    // let resultGraph = this.getUser();
+    let nodes = resultGraph[0].nodes;
+    let edges = resultGraph[1].edges;
 
-    let edges = [
-      { source: 1, target: 4, relation: "1", value: 1.3 },
-      { source: 4, target: 7, relation: "2", value: 1 },
-      { source: 4, target: 6, relation: "3", value: 1 },
-      { source: 4, target: 7, relation: "4", value: 1 },
-      { source: 1, target: 6, relation: "5", value: 2 },
-      { source: 2, target: 5, relation: "6", value: 0.9 },
-      { source: 3, target: 7, relation: "7", value: 1 },
-      { source: 5, target: 6, relation: "8", value: 1.6 },
-      { source: 6, target: 7, relation: "9", value: 0.7 },
-      { source: 6, target: 8, relation: "0", value: 2 },
-    ];
+    // let nodes = [
+    //   { name: "taras" },
+    //   { name: "Anton" },
+    //   { name: "Mariya" },
+    //   { name: "Vika" },
+    //   { name: "Arsen" },
+    // ];
+
+    // let edges = [
+    //   { source: 1, target: 0, relation: "0", value: 1.3 },
+    //   { source: 1, target: 1, relation: "1", value: 1 },
+    //   { source: 1, target: 2, relation: "2", value: 1 },
+    //   { source: 1, target: 3, relation: "3", value: 1 },
+    //   { source: 1, target: 4, relation: "4", value: 2 },
+    // ];
 
     let colorScale = d3
       .scaleOrdinal()
