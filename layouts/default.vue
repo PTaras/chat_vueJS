@@ -20,8 +20,9 @@
           </v-list-tile-action>
         </v-list-tile>
       </v-list>
-      <Chart />
+      <Chart :key="users.toString()" />
     </v-navigation-drawer>
+
     <v-toolbar app>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
@@ -77,5 +78,3 @@ export default {
 };
 </script>
   
-  <style>
-</style>

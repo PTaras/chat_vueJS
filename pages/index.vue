@@ -7,8 +7,8 @@
           <v-btn color="pink" flat @click="snackbar = false">Close</v-btn>
         </v-snackbar>
 
-        <v-card-title>
-          <h1>Chat</h1>
+        <v-card-title primary-title class="justify-center green--text">
+          <h1>Welcome to Chat</h1>
         </v-card-title>
         <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation>
