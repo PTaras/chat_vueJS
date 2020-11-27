@@ -1,22 +1,14 @@
-# chat-nuxt
-
-> My world-class Nuxt.js project
-
 ## Build Setup
 
 ``` bash
-# install dependencies
-$ npm install
+$git clone https://github.com/PTaras/chat_vueJS.git
+npm run dev
 
-# serve with hot reload at localhost:3000
-$ npm run dev
-
-# build for production and launch server
-$ npm run build
-$ npm start
-
-# generate static project
-$ npm run generate
+result http://localhost:3000/chat
 ```
 
-For detailed explanation on how things work, checkout [Nuxt.js docs](https://nuxtjs.org).
+<h3>Chat nuxt</h3>
+
+<p>После перехода по ссылка <a href='http://localhost:3000/chat'>http://localhost:3000/chat</a> открывается окно входа в чат
+<img src="https://prnt.sc/vrf79d" alt='Enter'></p>
+!![enter](https://github.com/PTaras/chat_vueJS/tree/main/assets/img/enter.png)
